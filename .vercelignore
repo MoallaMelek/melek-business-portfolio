@@ -1,0 +1,14 @@
+.git
+.env*
+.ai
+node_modules
+AI_TEAM.md
+AGENTS.md
+server.mjs
+package-lock.json
+package.json
+README.md
+UPDATE-GUIDE.md
+SOURCES.md
+VALIDATION.md
+demos/bol-miette/assets/bol-miette-brunch-demo.png
