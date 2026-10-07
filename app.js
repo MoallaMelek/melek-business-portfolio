@@ -21,13 +21,19 @@ $('#transform-range').addEventListener('input',e=>{const left=100-Number(e.targe
 function showcase(enabled){document.body.classList.toggle('showcase-active',enabled);$('#showcase-bar').hidden=!enabled;$('#showcase-toggle').setAttribute('aria-pressed',String(enabled));const url=new URL(location.href);if(enabled)url.searchParams.set('showcase','1');else url.searchParams.delete('showcase');history.replaceState(null,'',url);if(enabled)location.hash='top';}
 $('#showcase-toggle').addEventListener('click',()=>showcase(true));$('#showcase-close').addEventListener('click',()=>showcase(false));if(new URLSearchParams(location.search).has('showcase'))showcase(true);document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('showcase-active'))showcase(false);});
 $('#year').textContent=new Date().getFullYear();
-const previewVideo=$('#overdozz-video');const previewToggle=$('#preview-pause');let manualPause=false;const allowAuto=!matchMedia('(prefers-reduced-motion: reduce)').matches&&!navigator.connection?.saveData;
-function playPreview(){if(!previewVideo.src)previewVideo.src=previewVideo.dataset.src;previewVideo.play().catch(()=>{previewToggle.textContent='Lancer l’aperçu ↗';});}
-previewVideo.addEventListener('play',()=>{previewToggle.textContent='Pause aperçu Ⅱ';previewToggle.setAttribute('aria-pressed','true');});previewVideo.addEventListener('pause',()=>{previewToggle.textContent='Lancer l’aperçu ↗';previewToggle.setAttribute('aria-pressed','false');});
-previewToggle.addEventListener('click',()=>{if(previewVideo.paused){manualPause=false;playPreview();}else{manualPause=true;previewVideo.pause();}});
-if('IntersectionObserver' in window)new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting&&allowAuto&&!manualPause)playPreview();else if(!entry.isIntersecting)previewVideo.pause();}},{threshold:.2}).observe(previewVideo);
-document.addEventListener('visibilitychange',()=>{if(document.hidden)previewVideo.pause();});
-
+for (const [videoId, toggleId] of [['overdozz-video','preview-pause'],['cookiez-video','cookiez-preview-pause']]) {
+ const previewVideo=document.getElementById(videoId), previewToggle=document.getElementById(toggleId);
+ if(!previewVideo || !previewToggle) continue;
+ let manualPause=false;
+ const allowAuto=!matchMedia('(prefers-reduced-motion: reduce)').matches&&!navigator.connection?.saveData;
+ function playPreview(){if(!previewVideo.src)previewVideo.src=previewVideo.dataset.src;previewVideo.play().catch(()=>{previewToggle.textContent='Lancer l’aperçu ↗';});}
+ previewVideo.addEventListener('play',()=>{previewToggle.textContent='Pause aperçu Ⅱ';previewToggle.setAttribute('aria-pressed','true');});
+ previewVideo.addEventListener('pause',()=>{previewToggle.textContent='Lancer l’aperçu ↗';previewToggle.setAttribute('aria-pressed','false');});
+ previewVideo.addEventListener('error',()=>{previewToggle.textContent='Aperçu indisponible';previewToggle.disabled=true;});
+ previewToggle.addEventListener('click',()=>{if(previewVideo.paused){manualPause=false;playPreview();}else{manualPause=true;previewVideo.pause();}});
+ if('IntersectionObserver' in window)new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting&&allowAuto&&!manualPause)playPreview();else if(!entry.isIntersecting)previewVideo.pause();}},{threshold:.2}).observe(previewVideo);
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)previewVideo.pause();});
+}
 
 // Scroll reveal: content stays visible unless this runs successfully. Anything already on screen is shown immediately (no flash).
 if('IntersectionObserver' in window&&!matchMedia('(prefers-reduced-motion: reduce)').matches){const revealer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){entry.target.classList.add('is-visible');revealer.unobserve(entry.target);}}},{threshold:.12,rootMargin:'0px 0px -6% 0px'});document.querySelectorAll('[data-reveal]').forEach(el=>{if(el.getBoundingClientRect().top<innerHeight)el.classList.add('is-visible');else revealer.observe(el);});document.documentElement.classList.add('reveal-ready');}

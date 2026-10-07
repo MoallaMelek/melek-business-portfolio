@@ -17,14 +17,32 @@
   font-display: swap;
   font-weight: 400 700;
 }
+/* ↔ ↖ ↗ ↘ ↙ ✳ are not in the DM fonts. Without these faces iOS swaps in emoji tiles;
+   assets/arrows-*.woff2 (built by work/build-arrows.py) draw them the same everywhere. */
+@font-face {
+  font-family: Arrows;
+  src: url("/assets/arrows-400.woff2") format("woff2");
+  font-weight: 100 500;
+  font-display: block;
+  unicode-range: U+2194, U+2196-2199, U+2733;
+}
+@font-face {
+  font-family: Arrows;
+  src: url("/assets/arrows-600.woff2") format("woff2");
+  font-weight: 501 900;
+  font-display: block;
+  unicode-range: U+2194, U+2196-2199, U+2733;
+}
 :root {
   --paper: #f4f1e9;
   --ink: #22241f;
   --red: #bb3d28;
+  --forest: #25342a;
+  --sand: #d3bb82;
   --muted: #696c60;
   --line: #d8d9cc;
-  --serif: Display, Georgia, serif;
-  --sans: Body, Arial, sans-serif;
+  --serif: Arrows, Display, Georgia, serif;
+  --sans: Arrows, Body, Arial, sans-serif;
 }
 * {
   box-sizing: border-box;
@@ -35,6 +53,9 @@ html {
 }
 body {
   margin: 0;
+  /* viewport-fit=cover: keep content clear of a landscape notch */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
   background: var(--paper);
   color: var(--ink);
   font: 15px/1.5 var(--sans);
@@ -1908,7 +1929,7 @@ dialog::backdrop {
     font-size: 13px;
   }
   .footer {
-    padding: 30px 23px 94px;
+    padding: 30px 23px calc(94px + env(safe-area-inset-bottom));
     flex-wrap: wrap;
     gap: 20px;
   }
@@ -1922,48 +1943,71 @@ dialog::backdrop {
     margin-left: auto;
     font-size: 12px;
   }
-  .mobile-sales-nav {
+  /* One bottom bar on phones, normal or presentation mode: the site's forest green,
+     running down behind the iPhone home indicator (viewport-fit=cover + safe-area padding). */
+  .mobile-sales-nav,
+  .showcase-bar {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     z-index: 25;
+    background: var(--forest);
+    color: var(--paper);
+    border-top: 1px solid #f4f1e91f;
+    box-shadow: 0 -12px 30px #22241f1f;
+    padding: 8px max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  }
+  .mobile-sales-nav {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    background: var(--paper);
-    border-top: 1px solid #c9cdbb;
-    padding: 9px 7px max(9px, env(safe-area-inset-bottom));
-    gap: 4px;
-    box-shadow: 0 -4px 12px #22241f09;
+    gap: 2px;
   }
   .mobile-sales-nav a {
-    font-size: 11.5px;
-    padding: 12px 8px;
-    min-height: 40px;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    letter-spacing: 0.01em;
+    padding: 12px 9px;
+    min-height: 44px;
+    white-space: nowrap;
+    color: #f4f1e9d9;
   }
   .mobile-sales-nav .mobile-contact {
-    background: var(--red);
-    color: var(--paper);
-    padding: 11px 12px;
+    gap: 7px;
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 600;
+    padding: 12px 14px;
+  }
+  .mobile-sales-nav .mobile-contact span {
+    color: var(--red);
   }
   .showcase-bar {
-    bottom: 10px;
-    gap: 6px;
-    padding: 10px;
+    transform: none;
+    width: auto;
+    max-width: none;
+    gap: 0 4px;
     flex-wrap: wrap;
     justify-content: center;
-    max-width: calc(100vw - 20px);
-    font-size: 9px;
+    font-size: 11.5px;
   }
   .showcase-bar > span {
     width: 100%;
     text-align: center;
-    margin-bottom: 3px;
+    color: var(--sand);
+    font-size: 8.5px;
+    letter-spacing: 1.8px;
+    margin-bottom: 1px;
   }
   .showcase-bar a,
   .showcase-bar button {
-    padding: 8px 6px;
+    padding: 9px 6px;
+    color: #f4f1e9d9;
+  }
+  .showcase-active {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
   }
   .dialog-inner {
     padding: 55px 22px 25px;
@@ -1982,6 +2026,13 @@ dialog::backdrop {
   }
 }
 @media (max-width: 370px) {
+  .mobile-sales-nav a {
+    font-size: 11px;
+    padding: 12px 6px;
+  }
+  .mobile-sales-nav .mobile-contact {
+    padding: 12px 10px;
+  }
   .section {
     padding-left: 18px;
     padding-right: 18px;
@@ -2481,3 +2532,5 @@ dialog::backdrop {
   }
 }
 
+
+.showcase--cookiez { --bg:#3b201a; --fg:#fff1de; --soft:#dfcbb9; --accent:#f6b5c5; --cta:#f6b5c5; --cta-ink:#3b201a; scroll-margin-top:90px; }
