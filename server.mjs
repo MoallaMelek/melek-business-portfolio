@@ -6,6 +6,7 @@ const root=process.cwd();
 const publicFiles=new Set(['index.html','styles.css','app.js','menu.html','menu.css','menu.js','demo-ribbon.css','robots.txt','sitemap.xml']);
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.woff2':'font/woff2','.mp4':'video/mp4','.txt':'text/plain'};
 export function createServer(){return http.createServer((req,res)=>{
+ if(!['GET','HEAD'].includes(req.method)){res.writeHead(405,{'Allow':'GET, HEAD'});return res.end('Method not allowed');}
  let pathname;
  try{pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);}catch{res.writeHead(400);return res.end('Invalid URL');}
  const segments=pathname.split('/').filter(Boolean);
